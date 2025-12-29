@@ -1,0 +1,545 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#f3f6ff" />
+  <title>Lehrkraft – Klassencode & Teilnehmer-Codes</title>
+  <style>
+    :root{
+      --bg:#f3f6ff;
+      --bg-card:#ffffff;
+      --txt:#122033;
+      --muted:#7082a0;
+      --line:rgba(148,163,184,.25);
+      --accent:#2563eb;
+      --accent2:#3b82f6;
+      --ok:#16a34a;
+      --bad:#ef4444;
+      --shadow:0 12px 30px rgba(15,23,42,.12);
+      --r:22px;
+      --pad:18px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      color:var(--txt);
+      background:
+        radial-gradient(circle at top left, #dbeafe 0, transparent 55%),
+        radial-gradient(circle at bottom right, #bbf7d0 0, transparent 55%),
+        var(--bg);
+      min-height:100vh;
+      padding: 18px 14px 28px;
+    }
+    .wrap{max-width:980px;margin:0 auto}
+    header{padding: 10px 8px 18px;display:flex; gap:14px; align-items:flex-start; justify-content:space-between; flex-wrap:wrap;}
+    h1{margin:0;font-size: clamp(20px, 3vw, 30px);letter-spacing:.2px;}
+    .sub{margin:8px 0 0;color:var(--muted);font-size:14px;line-height:1.35;max-width: 80ch;}
+
+    .card{
+      background: var(--bg-card);
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .toolbar{
+      padding: var(--pad);
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:space-between;
+      border-bottom:1px solid var(--line);
+      background: linear-gradient(90deg, #e0ecff, #f9fafb);
+    }
+    .pill{
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(37,99,235,.10);
+      border: 1px solid rgba(148,163,184,.35);
+      color: var(--txt);
+      display:inline-flex;
+      gap:8px;
+      align-items:center;
+      white-space:nowrap;
+    }
+    .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;font-size: 12px;color: rgba(18,32,51,.70);}
+
+    .btn{
+      appearance:none;
+      border: 1px solid rgba(148,163,184,.35);
+      background: #eef2ff;
+      color: #111827;
+      padding: 12px 16px;
+      border-radius: 999px;
+      font-weight: 900;
+      cursor:pointer;
+      transition: transform .08s ease, background .12s ease;
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      user-select:none;
+    }
+    .btn:hover{ background:#e0e7ff }
+    .btn:active{ transform: translateY(1px) }
+    .btn.primary{border:none;background: linear-gradient(135deg, var(--accent2), var(--accent));color:#fff;}
+    .btn.danger{border:none;background: linear-gradient(135deg, #ef4444, #dc2626);color:#fff;}
+    .btn.ghost{ background:#fff; }
+
+    .panel{padding: var(--pad);}
+    .row{display:flex; gap:10px; flex-wrap:wrap; align-items:flex-end; margin-top:12px}
+    .field{display:flex; flex-direction:column; gap:6px; flex: 1 1 220px; min-width: 220px;}
+    label{font-size:12.5px;color:rgba(18,32,51,.80);font-weight:900}
+
+    input, select{
+      padding:10px 12px;
+      border-radius:999px;
+      border:1px solid rgba(148,163,184,.35);
+      background:#fff;
+      color:var(--txt);
+      outline:none;
+      font-weight:800;
+    }
+    input:focus, select:focus{
+      border-color: rgba(37,99,235,.7);
+      box-shadow: 0 0 0 4px rgba(37,99,235,.12);
+    }
+
+    .msg{
+      margin-top:12px;
+      padding:10px 12px;
+      border-radius:16px;
+      border:1px solid rgba(148,163,184,.35);
+      background: rgba(229,237,255,.7);
+      color: var(--txt);
+      font-size:13px;
+      line-height:1.35;
+      white-space:pre-wrap;
+      word-break:break-word;
+    }
+    .ok{color:var(--ok);font-weight:900}
+    .bad{color:var(--bad);font-weight:900}
+    .sep{height:1px;background:var(--line);margin:14px 0}
+
+    details{
+      margin-top:12px;
+      border:1px solid rgba(148,163,184,.35);
+      border-radius:16px;
+      background:#fff;
+      overflow:hidden;
+    }
+    summary{
+      list-style:none;
+      cursor:pointer;
+      padding:12px 14px;
+      font-weight:900;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      background:rgba(37,99,235,.06);
+    }
+    summary::-webkit-details-marker{display:none}
+    .accBody{ padding: 12px 14px; }
+
+    .codeBox{
+      margin-top:10px;
+      border:1px solid rgba(148,163,184,.35);
+      border-radius:16px;
+      background:#0b1220;
+      padding:10px 12px;
+      color:#e9f2ff;
+    }
+    .codeLine{font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; font-size: 13px; font-weight:900;}
+    .linkLine{font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; font-size: 12px; color: rgba(233,242,255,.80); word-break:break-all;}
+    .miniRow{display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top:10px}
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <h1>Lehrkraft – Klassencode & Teilnehmer-Codes</h1>
+        <p class="sub">
+          Ablauf: 1) Login (PIN) 2) Klassencode setzen (eingeben oder generieren) 3) Woche + Teilnehmer wählen → Code & Link kopieren.
+        </p>
+      </div>
+      <div class="pill">Status: <span class="mono" id="statusPill">prüfe…</span></div>
+    </header>
+
+    <div class="card">
+      <div class="toolbar">
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <button class="btn danger" id="btnLogout" type="button" style="display:none;">Logout</button>
+        </div>
+        <div class="pill">
+          Klassencode: <span class="mono" id="classPill">—</span>
+        </div>
+      </div>
+
+      <div class="panel">
+        <!-- LOGIN -->
+        <div id="loginBox">
+          <div class="msg">Bitte Lehrkraft-PIN eingeben.</div>
+          <div class="row">
+            <div class="field" style="max-width:320px;">
+              <label for="pin">Lehrkraft-PIN</label>
+              <input id="pin" inputmode="numeric" autocomplete="one-time-code" placeholder="z. B. 739162" />
+            </div>
+            <button class="btn primary" id="btnLogin" type="button">Anmelden</button>
+          </div>
+          <div class="msg" id="loginMsg" style="display:none;"></div>
+        </div>
+
+        <!-- APP -->
+        <div id="appBox" style="display:none;">
+          <div class="msg">
+            Tipp: Der Klassencode ist der Schlüssel, mit dem du Teilnehmer-Codes erzeugst.
+          </div>
+
+          <div class="sep"></div>
+
+          <!-- Klassencode -->
+          <div class="row">
+            <div class="field" style="max-width:420px;">
+              <label for="classCode">Klassencode</label>
+              <input id="classCode" placeholder="z. B. 7F3K9D2Q1M oder PFLEGE-2026-01" />
+            </div>
+            <button class="btn" id="btnGenerateClass" type="button">Neu generieren</button>
+            <button class="btn primary" id="btnSaveClass" type="button">Speichern</button>
+          </div>
+          <div class="msg" id="classMsg" style="display:none;"></div>
+
+          <div class="sep"></div>
+
+          <!-- Generator -->
+          <div id="codesHost"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function(){
+      "use strict";
+
+      const BASE = window.location.origin; // robust für jede Netlify-Domain
+
+      // Passe diese Lessons-URLs an, wenn deine Struktur anders ist:
+      const FIXED_WEEK_START = {
+        2:  BASE + "/lessons/L02D08.html",
+        3:  BASE + "/lessons/L03D15.html",
+        4:  BASE + "/lessons/L04D22.html",
+        5:  BASE + "/lessons/L05D29.html",
+        6:  BASE + "/lessons/L06D36.html",
+        7:  BASE + "/lessons/L07D43.html",
+        8:  BASE + "/lessons/L08D50.html",
+        9:  BASE + "/lessons/L09D57.html",
+        10: BASE + "/lessons/L10D64.html",
+        11: BASE + "/lessons/L11D71.html"
+      };
+
+      const $ = (id) => document.getElementById(id);
+
+      const statusPill = $("statusPill");
+      const classPill  = $("classPill");
+
+      const loginBox   = $("loginBox");
+      const appBox     = $("appBox");
+
+      const pin        = $("pin");
+      const btnLogin   = $("btnLogin");
+      const loginMsg   = $("loginMsg");
+
+      const classCode  = $("classCode");
+      const btnGenCls  = $("btnGenerateClass");
+      const btnSaveCls = $("btnSaveClass");
+      const classMsg   = $("classMsg");
+
+      const codesHost  = $("codesHost");
+      const btnLogout  = $("btnLogout");
+
+      function showMsg(el, text, ok){
+        el.style.display = "block";
+        el.innerHTML = (ok ? '<span class="ok">' : '<span class="bad">') + text + "</span>";
+      }
+      function hideMsg(el){ el.style.display = "none"; el.textContent = ""; }
+
+      function pad2(n){ return String(n).padStart(2,"0"); }
+
+      function normalizeClassCode(s){
+        const raw = String(s||"").trim();
+        return raw.replace(/[^\w\-]/g,"").slice(0, 32);
+      }
+
+      function genClassCode(){
+        const n = Math.floor(Math.random()*900000) + 100000;
+        const letters = "ABCDEFGHJKLMNPQRSTUVWXYZ";
+        const a = letters[Math.floor(Math.random()*letters.length)];
+        const b = letters[Math.floor(Math.random()*letters.length)];
+        return `K${n}${a}${b}`;
+      }
+
+      // Deterministischer PIN4 aus (classCode|W|T)
+      function hash32(str){
+        let h = 0x811c9dc5;
+        for(let i=0;i<str.length;i++){
+          h ^= str.charCodeAt(i);
+          h = Math.imul(h, 0x01000193);
+        }
+        return h >>> 0;
+      }
+      function pin4For(classCode, week, participant){
+        const key = classCode + "|W" + pad2(week) + "|T" + pad2(participant);
+        const h = hash32(key);
+        const pin4 = (h % 9000) + 1000;
+        return String(pin4);
+      }
+      function makeParticipantCode(classCode, week, participant){
+        return `${classCode}-W${pad2(week)}-T${pad2(participant)}-${pin4For(classCode, week, participant)}`;
+      }
+
+      function weekStartUrlAbs(week){
+        const w = Number(week);
+        if (FIXED_WEEK_START[w]) return FIXED_WEEK_START[w];
+        const startDay = (w - 1) * 7 + 1;
+        const file = `L${pad2(w)}D${pad2(startDay)}.html`;
+        return BASE + "/lessons/" + file;
+      }
+
+      function copyText(txt){
+        const s = String(txt||"");
+        if(navigator.clipboard && navigator.clipboard.writeText){
+          return navigator.clipboard.writeText(s);
+        }
+        const ta = document.createElement("textarea");
+        ta.value = s;
+        ta.style.position = "fixed";
+        ta.style.left = "-9999px";
+        document.body.appendChild(ta);
+        ta.select();
+        try{ document.execCommand("copy"); }catch{}
+        document.body.removeChild(ta);
+        return Promise.resolve();
+      }
+
+      async function checkSession(){
+        const res = await fetch("/.netlify/functions/teacher-auth", { credentials: "include" });
+        const data = await res.json().catch(()=>null);
+        return !!(data && data.ok && data.authenticated);
+      }
+
+      async function loginWithPin(pinValue){
+        const p = String(pinValue || "").trim();
+        const res = await fetch("/.netlify/functions/teacher-auth", {
+          method: "POST",
+          headers: { "Content-Type":"application/json" },
+          credentials: "include",
+          body: JSON.stringify({ pin: p })
+        });
+        const data = await res.json().catch(()=>null);
+        if (res.ok && data && data.ok) return { ok:true };
+        return { ok:false, error: (data && data.error) ? data.error : ("HTTP " + res.status) };
+      }
+
+      function mountGenerator(activeClassCode){
+        codesHost.innerHTML = "";
+
+        const details = document.createElement("details");
+        details.open = true;
+
+        const summary = document.createElement("summary");
+        summary.innerHTML = `<span>Woche · Teilnehmer</span><span class="mono">Code + Link</span>`;
+        details.appendChild(summary);
+
+        const body = document.createElement("div");
+        body.className = "accBody";
+
+        const info = document.createElement("div");
+        info.className = "msg";
+        info.textContent = "Wähle Woche und Teilnehmer. Dann kopierst du Code und/oder Link und gibst sie an den Teilnehmer weiter.";
+
+        const row = document.createElement("div");
+        row.className = "row";
+
+        const wField = document.createElement("div");
+        wField.className = "field";
+        wField.innerHTML = "<label>Woche</label>";
+        const wSel = document.createElement("select");
+        for(let w=1; w<=12; w++){
+          const opt = document.createElement("option");
+          opt.value = String(w);
+          opt.textContent = "Woche " + w;
+          wSel.appendChild(opt);
+        }
+        wField.appendChild(wSel);
+
+        const tField = document.createElement("div");
+        tField.className = "field";
+        tField.innerHTML = "<label>Teilnehmer</label>";
+        const tSel = document.createElement("select");
+        for(let t=1; t<=20; t++){
+          const opt = document.createElement("option");
+          opt.value = String(t);
+          opt.textContent = "Teilnehmer " + t;
+          tSel.appendChild(opt);
+        }
+        tField.appendChild(tSel);
+
+        const btnShow = document.createElement("button");
+        btnShow.className = "btn primary";
+        btnShow.type = "button";
+        btnShow.textContent = "Anzeigen";
+
+        row.appendChild(wField);
+        row.appendChild(tField);
+        row.appendChild(btnShow);
+
+        const box = document.createElement("div");
+        box.className = "codeBox";
+        box.innerHTML = "<div class='msg' style='background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.12);color:#e9f2ff'>Bitte Woche + Teilnehmer auswählen und auf „Anzeigen“ klicken.</div>";
+
+        async function renderSelected(){
+          const w = Number(wSel.value);
+          const t = Number(tSel.value);
+
+          const code = makeParticipantCode(activeClassCode, w, t);
+          const link = weekStartUrlAbs(w);
+          const both = `Teilnehmer-Code: ${code}\nLink: ${link}`;
+
+          box.innerHTML = `
+            <div class="msg" style="background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.12);color:#e9f2ff">
+              <div><span class="mono">Klassencode</span> <b>${activeClassCode}</b> · Woche <b>${w}</b> · Teilnehmer <b>${t}</b></div>
+              <div style="margin-top:8px" class="codeLine">${code}</div>
+              <div style="margin-top:6px" class="linkLine">${link}</div>
+
+              <div class="miniRow">
+                <button class="btn ghost" type="button" id="copyCode">Code kopieren</button>
+                <button class="btn ghost" type="button" id="copyLink">Link kopieren</button>
+                <button class="btn" type="button" id="copyBoth">Beides kopieren</button>
+                <a class="btn primary" href="${link}" target="_blank" rel="noopener">Öffnen</a>
+              </div>
+            </div>
+          `;
+
+          const b1 = box.querySelector("#copyCode");
+          const b2 = box.querySelector("#copyLink");
+          const b3 = box.querySelector("#copyBoth");
+
+          b1.onclick = async ()=>{ await copyText(code); b1.textContent="Kopiert!"; setTimeout(()=>b1.textContent="Code kopieren",900); };
+          b2.onclick = async ()=>{ await copyText(link); b2.textContent="Kopiert!"; setTimeout(()=>b2.textContent="Link kopieren",900); };
+          b3.onclick = async ()=>{ await copyText(both); b3.textContent="Kopiert!"; setTimeout(()=>b3.textContent="Beides kopieren",900); };
+        }
+
+        btnShow.onclick = renderSelected;
+
+        body.appendChild(info);
+        body.appendChild(row);
+        body.appendChild(box);
+
+        details.appendChild(body);
+        codesHost.appendChild(details);
+      }
+
+      function enterApp(){
+        loginBox.style.display = "none";
+        appBox.style.display = "block";
+        btnLogout.style.display = "inline-flex";
+        statusPill.textContent = "angemeldet";
+
+        try{
+          const saved = JSON.parse(localStorage.getItem("teacher_class_cfg") || "null");
+          if(saved && saved.classCode){
+            classCode.value = saved.classCode;
+            classPill.textContent = saved.classCode;
+            mountGenerator(saved.classCode);
+          } else {
+            classPill.textContent = "—";
+            codesHost.innerHTML = "<div class='msg'>Bitte zuerst einen Klassencode eingeben oder generieren und speichern.</div>";
+          }
+        }catch{
+          classPill.textContent = "—";
+          codesHost.innerHTML = "<div class='msg'>Bitte zuerst einen Klassencode eingeben oder generieren und speichern.</div>";
+        }
+      }
+
+      btnLogin.onclick = async ()=>{
+        hideMsg(loginMsg);
+        const val = String(pin.value || "").trim();
+        if(!val){
+          showMsg(loginMsg, "Bitte PIN eingeben.", false);
+          return;
+        }
+        statusPill.textContent = "prüfe…";
+        const r = await loginWithPin(val);
+        if(!r.ok){
+          statusPill.textContent = "nicht angemeldet";
+          showMsg(loginMsg, "PIN falsch oder nicht erlaubt.", false);
+          return;
+        }
+        showMsg(loginMsg, "OK. Angemeldet.", true);
+        enterApp();
+      };
+
+      pin.addEventListener("keydown", (e)=>{ if(e.key === "Enter") btnLogin.click(); });
+
+      btnGenCls.onclick = ()=>{
+        const c = genClassCode();
+        classCode.value = c;
+        showMsg(classMsg, "Neuer Klassencode erzeugt: " + c + " (bitte speichern)", true);
+      };
+
+      btnSaveCls.onclick = ()=>{
+        hideMsg(classMsg);
+        const c = normalizeClassCode(classCode.value);
+        if(!c){
+          showMsg(classMsg, "Bitte einen gültigen Klassencode eingeben oder generieren.", false);
+          return;
+        }
+        try{ localStorage.setItem("teacher_class_cfg", JSON.stringify({ classCode: c })); }catch{}
+        classPill.textContent = c;
+        showMsg(classMsg, "Gespeichert. Aktiver Klassencode: " + c, true);
+        mountGenerator(c);
+      };
+
+      btnLogout.onclick = async ()=>{
+        try{
+          await fetch("/.netlify/functions/teacher-auth?logout=1", { method:"GET", credentials:"include" });
+        }catch{}
+        statusPill.textContent = "nicht angemeldet";
+        classPill.textContent = "—";
+        appBox.style.display = "none";
+        loginBox.style.display = "block";
+        btnLogout.style.display = "none";
+        pin.value = "";
+        hideMsg(classMsg);
+        hideMsg(loginMsg);
+        codesHost.textContent = "";
+      };
+
+      // init: session check
+      (async ()=>{
+        try{
+          const authed = await checkSession();
+          statusPill.textContent = authed ? "angemeldet" : "nicht angemeldet";
+          if(authed) enterApp();
+          else {
+            loginBox.style.display = "block";
+            appBox.style.display = "none";
+            btnLogout.style.display = "none";
+          }
+        }catch{
+          statusPill.textContent = "nicht angemeldet";
+          loginBox.style.display = "block";
+          appBox.style.display = "none";
+          btnLogout.style.display = "none";
+        }
+      })();
+    })();
+  </script>
+</body>
+</html>
